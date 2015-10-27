@@ -19,6 +19,8 @@ package org.gradle.api.internal.tasks.scala;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.typesafe.zinc.*;
+import xsbti.compile.IncOptions;
+import xsbti.compile.IncOptionsUtil;
 import org.gradle.api.internal.tasks.SimpleWorkResult;
 import org.gradle.api.internal.tasks.compile.CompilationFailedException;
 import org.gradle.language.base.internal.compile.Compiler;
@@ -75,21 +77,9 @@ public class ZincScalaCompiler implements Compiler<ScalaJavaJointCompileSpec>, S
         }
 
         private static IncOptions getIncOptions() {
-            //The values are based on what I have found in sbt-compiler-maven-plugin.googlecode.com and zinc documentation
-            //Hard to say what effect they have on the incremental build
-            int transitiveStep = 3;
-            double recompileAllFraction = 0.5d;
-            boolean relationsDebug = false;
-            boolean apiDebug = false;
-            int apiDiffContextSize = 5;
-            Option<File> apiDumpDirectory = Option.empty();
-            boolean transactional = false;
-            Option<File> backup = Option.empty();
-
-            // We need to use the deprecated constructor as it is compatible with certain previous versions of the Zinc compiler
-            @SuppressWarnings("deprecation")
-            IncOptions options = new IncOptions(transitiveStep, recompileAllFraction, relationsDebug, apiDebug, apiDiffContextSize, apiDumpDirectory, transactional, backup);
-            return options;
+            // Because these parameters are specific to sbt's incremental compiler, we cannot configure them
+            // using Gradle. We simply return the default parameters.
+            return IncOptionsUtil.defaultIncOptions;
         }
 
         static com.typesafe.zinc.Compiler createCompiler(Iterable<File> scalaClasspath, Iterable<File> zincClasspath, xsbti.Logger logger) {

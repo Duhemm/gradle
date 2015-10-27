@@ -1,12 +1,20 @@
 apply from: "$rootDir/gradle/providedConfiguration.gradle"
 
+repositories {
+    mavenLocal()
+
+    maven {
+        url 'http://dl.bintray.com/sbt/sbt-maven-releases'
+    }
+}
+
 dependencies {
     compile project(":core")
     compile project(":platformJvm")
     compile project(":languageJava")
     compile project(":languageJvm")
     // keep in sync with ScalaLanguagePlugin code
-    provided("com.typesafe.zinc:zinc:0.3.7")
+    provided("com.typesafe.zinc:zinc:0.3.10-SNAPSHOT")
 
     testCompile libraries.groovy
 }

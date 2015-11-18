@@ -16,6 +16,7 @@
 package org.gradle.api.plugins.scala
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.internal.file.FileResolver
 import org.gradle.api.internal.tasks.DefaultScalaSourceSet
@@ -33,6 +34,7 @@ import javax.inject.Inject
 
 class ScalaBasePlugin implements Plugin<Project> {
     static final String ZINC_CONFIGURATION_NAME = "zinc"
+    static final String ZINC_CLASSPATH_EXTENSION = "zinccp";
 
     static final String SCALA_RUNTIME_EXTENSION_NAME = "scalaRuntime"
 
@@ -50,6 +52,7 @@ class ScalaBasePlugin implements Plugin<Project> {
         this.project = project
         project.pluginManager.apply(JavaBasePlugin)
         def javaPlugin = project.plugins.getPlugin(JavaBasePlugin.class)
+        project.extensions.create(ZINC_CLASSPATH_EXTENSION, ZincClasspathExtension)
 
         configureConfigurations(project)
         configureScalaRuntimeExtension()
@@ -93,6 +96,10 @@ class ScalaBasePlugin implements Plugin<Project> {
         // cannot use convention mapping because the resulting object won't be serializable
         // cannot compute at task execution time because we need association with source set
         project.gradle.projectsEvaluated {
+            FileCollection zincClasspath = project.extensions.zinccp.zincClasspath
+            if (!zincClasspath.empty) {
+                scalaCompile.zincClasspath = zincClasspath
+            }
             scalaCompile.scalaCompileOptions.incrementalOptions.with {
                 if (!analysisFile) {
                     analysisFile = new File("$project.buildDir/tmp/scala/compilerAnalysis/${scalaCompile.name}.analysis")

@@ -44,7 +44,7 @@ class ScalaToolProviderNotAvailableIntegrationTest extends AbstractIntegrationSp
         when:
         fails("assemble")
         then:
-        errorOutput.contains("Cannot provide Scala Compiler: Cannot resolve external dependency org.scala-lang:scala-compiler:2.10.4 because no repositories are defined.")
+        errorOutput.contains("Cannot provide Scala Compiler: Cannot resolve external dependency org.scala-lang:scala-compiler:2.10.5 because no repositories are defined.")
 
     }
 }

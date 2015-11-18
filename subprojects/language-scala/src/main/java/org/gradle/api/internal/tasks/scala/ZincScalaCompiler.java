@@ -29,7 +29,6 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.WorkResult;
 import org.gradle.internal.jvm.Jvm;
-import scala.Option;
 import xsbti.F0;
 
 import java.io.File;
@@ -79,7 +78,7 @@ public class ZincScalaCompiler implements Compiler<ScalaJavaJointCompileSpec>, S
         private static IncOptions getIncOptions() {
             // Because these parameters are specific to sbt's incremental compiler, we cannot configure them
             // using Gradle. We simply return the default parameters.
-            return IncOptionsUtil.defaultIncOptions;
+            return IncOptionsUtil.defaultIncOptions();
         }
 
         static com.typesafe.zinc.Compiler createCompiler(Iterable<File> scalaClasspath, Iterable<File> zincClasspath, xsbti.Logger logger) {

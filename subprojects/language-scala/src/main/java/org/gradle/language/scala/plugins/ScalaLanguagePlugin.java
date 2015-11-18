@@ -106,7 +106,7 @@ public class ScalaLanguagePlugin implements Plugin<Project> {
                     JavaPlatform javaPlatform = binary.getTargetPlatform();
                     // TODO RG resolve the scala platform from the binary
 
-                    compile.setPlatform(new DefaultScalaPlatform("2.10.4"));
+                    compile.setPlatform(new DefaultScalaPlatform("2.10.5"));
                     File analysisFile = new File(task.getTemporaryDir(), String.format("compilerAnalysis/%s.analysis", task.getName()));
                     compile.getScalaCompileOptions().getIncrementalOptions().setAnalysisFile(analysisFile);
 

@@ -28,6 +28,7 @@ import org.gradle.language.scala.ScalaPlatform;
 import org.gradle.platform.base.internal.toolchain.ToolProvider;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Set;
 
 public class DownloadingScalaToolChain implements ScalaToolChainInternal {
@@ -59,11 +60,34 @@ public class DownloadingScalaToolChain implements ScalaToolChainInternal {
             Configuration zincClasspath = resolveDependency(String.format("com.typesafe.zinc:zinc:%s", DefaultScalaToolProvider.DEFAULT_ZINC_VERSION));
             Set<File> resolvedScalaClasspath = scalaClasspath.resolve();
             Set<File> resolvedZincClasspath = zincClasspath.resolve();
+
+            // Unfortunately, the Zinc artifacts *always* pull in scala library, reflect and compiler 2.11.7 in
+            // `resolvedZincClasspath`. This is a problem, because we may be using 2.10.5.
+            // The correct versions of the library and compiler are in `resolvedScalaClasspath`.
+            resolvedZincClasspath = removeScalaComponents(resolvedZincClasspath);
+            resolvedZincClasspath.addAll(resolvedScalaClasspath);
+
             return new DefaultScalaToolProvider(projectFinder, compilerDaemonManager, resolvedScalaClasspath, resolvedZincClasspath);
 
         } catch(ResolveException resolveException) {
             return new NotFoundScalaToolProvider(resolveException);
         }
+    }
+
+    private static Set<File> removeScalaComponents(Set<File> jars) {
+        Set<File> nonScalaComponents = new HashSet<File>();
+        for (File jar: jars) {
+            if (!isScalaComponent(jar)) {
+                nonScalaComponents.add(jar);
+            }
+        }
+        return nonScalaComponents;
+    }
+
+    private static boolean isScalaComponent(File jar) {
+        String jarName = jar.getName();
+
+        return jarName.contains("scala-library") || jarName.contains("scala-reflect") || jarName.contains("scala-compiler");
     }
 
     private Configuration resolveDependency(Object dependencyNotation) {
